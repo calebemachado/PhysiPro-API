@@ -2,12 +2,28 @@ import dotenv from 'dotenv';
 import { app } from './interfaces/http/app';
 import { sequelize } from './config/database';
 import { syncModels } from './infrastructure/persistence/sequelize/models';
+import { logger } from './infrastructure/logging/logger';
+import { appLogger, dbLogger } from './infrastructure/logging/log-utils';
+import { setupUncaughtHandlers } from './infrastructure/logging/uncaught-handler';
 
 // Load environment variables
 dotenv.config();
 
 // Set port
 const PORT = process.env.PORT || 3000;
+
+// Log environment and configuration (sanitized)
+appLogger.config({
+  NODE_ENV: process.env.NODE_ENV,
+  PORT,
+  DB_HOST: process.env.DB_HOST,
+  DB_PORT: process.env.DB_PORT,
+  DB_NAME: process.env.DB_NAME,
+  DB_SYNC_FORCE: process.env.DB_SYNC_FORCE
+});
+
+// Setup handlers for uncaught exceptions and unhandled rejections
+setupUncaughtHandlers();
 
 /**
  * Sync database models
@@ -21,12 +37,16 @@ async function syncDatabase(): Promise<void> {
                   process.env.DB_SYNC_FORCE === 'true';
 
     if (force) {
-      console.warn('WARNING: Database sync with { force: true } will delete all data!');
+      logger.warn('WARNING: Database sync with { force: true } will delete all data!');
     }
 
     await syncModels(force);
+    dbLogger.info('Database models synchronized successfully', { force });
   } catch (error) {
-    console.error('Failed to sync database:', error);
+    logger.error('Failed to sync database', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
     throw error;
   }
 }
@@ -37,9 +57,9 @@ async function syncDatabase(): Promise<void> {
 async function testDatabaseConnection(): Promise<void> {
   try {
     await sequelize.authenticate();
-    console.log('Database connection established successfully.');
+    dbLogger.info('Database connection established successfully');
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    dbLogger.error(error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -49,26 +69,30 @@ async function testDatabaseConnection(): Promise<void> {
  */
 async function startServer(): Promise<void> {
   try {
+    appLogger.startup('Starting PhysiPro API server');
+
     // Test database connection and sync models
+    logger.info('Testing database connection...');
     await testDatabaseConnection();
+
+    logger.info('Synchronizing database models...');
     await syncDatabase();
 
     // Start the server
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-      console.log(`API documentation available at http://localhost:${PORT}/api-docs`);
+      appLogger.startup(`Server running on port ${PORT}`, {
+        environment: process.env.NODE_ENV || 'development',
+        docs: `http://localhost:${PORT}/api-docs`
+      });
     });
   } catch (error) {
-    console.error('Server startup failed:', error);
+    logger.error('Server startup failed', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
     process.exit(1);
   }
 }
-
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (error) => {
-  console.error('Unhandled promise rejection:', error);
-  process.exit(1);
-});
 
 // Start the server
 startServer();

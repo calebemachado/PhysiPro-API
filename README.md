@@ -114,6 +114,25 @@ src/
 
 API documentation is available at `/api/docs` when the server is running.
 
+## Logging System
+
+The application uses a robust logging system with the following features:
+
+- **Structured Logging**: All logs are in JSON format for easy parsing and analysis
+- **Log Rotation**: Daily log rotation with automatic compression of old logs
+- **Log Levels**: Different log levels (debug, info, warn, error) with appropriate filtering
+- **Request Logging**: Detailed HTTP request/response logging with timing information
+- **Error Tracking**: Comprehensive error logging with stack traces
+- **Database Query Logging**: SQL query logging with execution times
+- **Security**: Automatic redaction of sensitive information (passwords, tokens, etc.)
+- **Log Categories**: Dedicated loggers for different components (API, DB, Auth, App)
+
+Logs are stored in the `logs` directory with the following files:
+- `application-%DATE%.log` - All logs (info level and above)
+- `error-%DATE%.log` - Error logs only
+
+During development, logs are also output to the console with color coding.
+
 ## Development
 
 ### Development with Database Auto-start

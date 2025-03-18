@@ -1,7 +1,7 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
-import morgan from 'morgan';
+// Remove Morgan import as we'll use our custom logger
 // Use require for compression to avoid TypeScript issues
 const compression = require('compression');
 import swaggerUi from 'swagger-ui-express';
@@ -9,6 +9,9 @@ import { errorMiddleware } from './middleware/error.middleware';
 import { userRoutes } from './routes/user.routes';
 import { authRoutes } from './routes/auth.routes';
 import swaggerSpec from './swagger';
+import { requestLogger } from '../../infrastructure/web/middleware/request-logger.middleware';
+import { errorHandler } from '../../infrastructure/web/middleware/error-handler.middleware';
+import { logger } from '../../infrastructure/logging/logger';
 
 /**
  * Express application setup
@@ -21,6 +24,8 @@ class App {
     this.setupMiddleware();
     this.setupRoutes();
     this.setupErrorHandling();
+
+    logger.info('Express application initialized');
   }
 
   /**
@@ -38,9 +43,9 @@ class App {
     // Performance middleware
     this.app.use(compression());
 
-    // Logging
+    // Custom request logging middleware (replacing Morgan)
     if (process.env.NODE_ENV !== 'test') {
-      this.app.use(morgan('dev'));
+      this.app.use(requestLogger());
     }
   }
 
@@ -76,7 +81,8 @@ class App {
    * Configure error handling
    */
   private setupErrorHandling(): void {
-    this.app.use(errorMiddleware);
+    // Use our custom error handler instead of the original middleware
+    this.app.use(errorHandler());
   }
 }
 
