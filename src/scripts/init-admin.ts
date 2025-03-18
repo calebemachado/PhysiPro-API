@@ -4,56 +4,62 @@
  */
 
 import dotenv from 'dotenv';
-import { User, UserType } from '../models/user.model';
 import { sequelize } from '../config/database';
+import { syncModels } from '../infrastructure/persistence/sequelize/models';
+import { userRepository } from '../infrastructure/persistence/sequelize/repositories';
+import { UserType } from '../domain/entities/user';
+import { v4 as uuidv4 } from 'uuid';
 
+// Load environment variables
 dotenv.config();
 
+// Admin constants
 const ADMIN_EMAIL = 'admin@physipro.com';
 const ADMIN_PASSWORD = 'admin123456';
 
-async function createAdmin(): Promise<void> {
+/**
+ * Create admin user
+ */
+const createAdmin = async (): Promise<void> => {
   try {
     console.log('Connecting to database...');
     await sequelize.authenticate();
-    
-    console.log('Syncing database models...');
-    await sequelize.sync();
-    
-    console.log('Checking if admin exists...');
-    const existingAdmin = await User.findOne({ 
-      where: { email: ADMIN_EMAIL } 
-    });
-    
+
+    // Sync models
+    await syncModels(false);
+
+    // Check if admin already exists
+    const existingAdmin = await userRepository.findByEmail(ADMIN_EMAIL);
+
     if (existingAdmin) {
-      console.log('Admin user already exists. No action needed.');
+      console.log('Admin user already exists.');
       return;
     }
-    
-    console.log('Creating admin user...');
-    const admin = await User.create({
-      name: 'Admin User',
+
+    // Create admin user
+    const admin = await userRepository.create({
+      id: uuidv4(),
+      name: 'Administrator',
       email: ADMIN_EMAIL,
       password: ADMIN_PASSWORD,
-      cpf: '000.000.000-00',
+      cpf: '00000000000', // Placeholder CPF
       userType: UserType.ADMIN,
       active: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
     });
-    
-    console.log('Admin user created successfully!');
-    console.log('------------------------------');
-    console.log('Login credentials:');
-    console.log(`Email: ${ADMIN_EMAIL}`);
-    console.log(`Password: ${ADMIN_PASSWORD}`);
-    console.log('------------------------------');
-    console.log('IMPORTANT: Change this password after first login!');
-    
+
+    console.log('Admin user created successfully.');
+    console.log('Email:', ADMIN_EMAIL);
+    console.log('Password:', ADMIN_PASSWORD);
+    console.log('IMPORTANT: Please change this password after first login!');
   } catch (error) {
     console.error('Error creating admin user:', error);
   } finally {
+    // Close database connection
     await sequelize.close();
-    process.exit(0);
   }
-}
+};
 
-createAdmin(); 
+// Run the script
+createAdmin();

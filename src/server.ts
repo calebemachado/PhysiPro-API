@@ -1,52 +1,74 @@
-import app from './app';
-import { sequelize, testDatabaseConnection } from './config/database';
 import dotenv from 'dotenv';
+import { app } from './interfaces/http/app';
+import { sequelize } from './config/database';
+import { syncModels } from './infrastructure/persistence/sequelize/models';
 
+// Load environment variables
 dotenv.config();
 
-const PORT = process.env.PORT || '3000';
+// Set port
+const PORT = process.env.PORT || 3000;
 
-// Test database connection
-testDatabaseConnection();
-
-// Sync database models (in production, use migrations instead)
-const syncDatabase = async (): Promise<void> => {
+/**
+ * Sync database models
+ * Warning: setting force to true will drop tables in development
+ */
+async function syncDatabase(): Promise<void> {
   try {
-    if (process.env.NODE_ENV === 'development') {
-      // In development, sync with { force: true } to drop tables and recreate
-      // WARNING: This will delete all data. Only for development!
-      await sequelize.sync({ force: process.env.DB_RESET === 'true' });
-      console.info('Database synced successfully');
-    } else {
-      // In production, just sync without force
-      await sequelize.sync();
-      console.info('Database synced successfully');
+    // In development, we might want to sync the database with { force: true }
+    // to recreate tables, but this would delete all data
+    const force = process.env.NODE_ENV === 'development' &&
+                  process.env.DB_SYNC_FORCE === 'true';
+
+    if (force) {
+      console.warn('WARNING: Database sync with { force: true } will delete all data!');
     }
-  } catch (error) {
-    console.error('Error syncing database:', error);
-  }
-};
 
-// Start server
-const startServer = async (): Promise<void> => {
+    await syncModels(force);
+  } catch (error) {
+    console.error('Failed to sync database:', error);
+    throw error;
+  }
+}
+
+/**
+ * Test the database connection
+ */
+async function testDatabaseConnection(): Promise<void> {
   try {
+    await sequelize.authenticate();
+    console.log('Database connection established successfully.');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+    throw error;
+  }
+}
+
+/**
+ * Start the server
+ */
+async function startServer(): Promise<void> {
+  try {
+    // Test database connection and sync models
+    await testDatabaseConnection();
     await syncDatabase();
-    
-    app.listen(parseInt(PORT, 10), () => {
-      console.info(`Server running on http://localhost:${PORT}`);
-      console.info(`API Documentation available at http://localhost:${PORT}/api-docs`);
+
+    // Start the server
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`API documentation available at http://localhost:${PORT}/api-docs`);
     });
   } catch (error) {
-    console.error('Failed to start server:', error);
+    console.error('Server startup failed:', error);
     process.exit(1);
   }
-};
+}
 
 // Handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Rejection:', err);
-  // Close server & exit process
+process.on('unhandledRejection', (error) => {
+  console.error('Unhandled promise rejection:', error);
   process.exit(1);
 });
 
-startServer(); 
+// Start the server
+startServer();

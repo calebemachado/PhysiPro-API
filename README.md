@@ -1,124 +1,148 @@
 # PhysiPro API
 
-A RESTful API for the PhysiPro application, providing role-based access control and features for physical therapy professionals and their clients.
+A robust API for physical therapy professionals to manage patients, treatment plans, and progress tracking.
 
 ## Features
 
-- User authentication with JWT
-- Role-based access control (Admin, Trainer, Student)
-- Secure password handling with bcrypt
-- PostgreSQL database with Sequelize ORM
-- API documentation with Swagger
-- Email notifications
-- TypeScript for type safety
-- Docker support for development
+- **User Management**: Registration, authentication, and authorization
+- **Role-based Access Control**: Admin, Trainer, and Student roles
+- **Clean Architecture**: Domain-driven design with clear separation of concerns
+- **API Documentation**: Comprehensive API documentation
 
-## Requirements
+## Technology Stack
 
-- Node.js (v16+)
+- **Framework**: Express.js with TypeScript
+- **Database**: PostgreSQL with Sequelize ORM
+- **Authentication**: JWT (JSON Web Tokens)
+- **Validation**: Express Validator
+- **Testing**: Jest with Supertest
+- **Docker**: Containerized development environment
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v16 or later)
 - npm or yarn
-- PostgreSQL
-- Docker (optional)
-
-## Setup
-
-### Environment Variables
-
-Copy the sample environment file and update the values:
-
-```bash
-cp .env.sample .env
-```
-
-### Database Setup
-
-Option 1: Using Docker (recommended for development):
-
-```bash
-npm run docker:start
-```
-
-Option 2: Manual PostgreSQL setup:
-1. Install PostgreSQL
-2. Create a database named `physipro`
-3. Update the .env file with your database credentials
+- PostgreSQL (or Docker for containerized DB)
 
 ### Installation
 
-Install dependencies:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/physipro-api.git
+   cd physipro-api
+   ```
 
-```bash
-npm install
-```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-### Running the Application
+3. Create `.env` file:
+   ```
+   NODE_ENV=development
+   PORT=3000
+   
+   # Database Configuration
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_NAME=physipro
+   DB_USER=postgres
+   DB_PASSWORD=postgres
+   
+   # JWT Configuration
+   JWT_SECRET=your-secret-key
+   JWT_EXPIRES_IN=24h
+   
+   # Optional: Reset DB on restart (development only)
+   DB_RESET=false
+   ```
 
-Development mode:
+4. Start development server:
+   ```bash
+   npm run dev
+   ```
 
-```bash
-npm run dev
-```
+### Docker Setup
 
-Production mode:
+1. Start the database:
+   ```bash
+   docker-compose up -d db
+   ```
 
-```bash
-npm run build
-npm start
-```
+2. Run the application:
+   ```bash
+   npm run dev
+   ```
 
-### Create Admin User
+### Database Setup
 
-Create an initial admin user:
-
+For first-time setup, initialize the admin user:
 ```bash
 npm run init:admin
 ```
-
-Initial credentials:
-- Email: admin@physipro.com
-- Password: admin123456
-
-**Important**: Change this password after the first login!
-
-## API Documentation
-
-After starting the server, access the API documentation at:
-
-```
-http://localhost:3000/api-docs
-```
-
-## Available Scripts
-
-- `npm run dev`: Start the server in development mode
-- `npm run build`: Build the project
-- `npm start`: Start the server in production mode
-- `npm test`: Run tests
-- `npm run lint`: Run linting
-- `npm run format`: Format code with Prettier
-- `npm run docker:start`: Start PostgreSQL database with Docker
-- `npm run docker:stop`: Stop the Docker containers
-- `npm run docker:logs`: View database logs
-- `npm run init:admin`: Initialize admin user
-- `npm run typecheck`: Check TypeScript types
 
 ## Project Structure
 
 ```
 src/
-├── config/         # Configuration files
-├── controllers/    # Request handlers
-├── middleware/     # Express middleware
-├── models/         # Database models
-├── routes/         # API routes
-├── scripts/        # Utility scripts
-├── services/       # Business logic
-├── types/          # TypeScript type definitions
-├── utils/          # Utility functions
-├── app.ts          # Express application
-└── server.ts       # Server entry point
+├── domain/               # Domain layer - Business rules and entities
+│   ├── entities/         # Domain entities
+│   ├── repositories/     # Repository interfaces
+│   ├── services/         # Service interfaces
+│   └── errors/           # Domain-specific errors
+├── infrastructure/       # Infrastructure layer - Implementations
+│   ├── auth/             # Authentication services
+│   ├── persistence/      # Database access
+│   │   └── sequelize/    # Sequelize implementation
+│   └── web/              # Web layer
+│       ├── controllers/  # API controllers
+│       ├── middleware/   # Express middleware
+│       └── routes/       # API routes
+├── config/               # Configuration files
+├── types/                # TypeScript declaration files
+└── scripts/              # Utility scripts
 ```
+
+## API Documentation
+
+API documentation is available at `/api/docs` when the server is running.
+
+## Development
+
+### Build
+
+```bash
+npm run build
+```
+
+### Run Tests
+
+```bash
+npm test
+```
+
+### Linting
+
+```bash
+npm run lint
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-[MIT](LICENSE) 
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contact
+
+Your Name - calebe@clsax.tech
+
+Project Link: [https://github.com/your-username/physipro-api](https://github.com/your-username/physipro-api) 
