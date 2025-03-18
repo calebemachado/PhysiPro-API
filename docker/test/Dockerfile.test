@@ -1,0 +1,23 @@
+FROM node:16-alpine
+
+# Install bash and other required utilities
+RUN apk add --no-cache bash
+
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install all dependencies (including dev dependencies) with legacy-peer-deps flag
+RUN npm ci --legacy-peer-deps
+
+# Install Babel, TypeScript and testing dependencies
+RUN npm install --no-save --legacy-peer-deps \
+  @babel/core @babel/preset-env @babel/preset-typescript \
+  @babel/plugin-proposal-class-properties @babel/plugin-proposal-object-rest-spread \
+  @babel/plugin-proposal-decorators
+
+# Copy source code
+COPY . .
+
+# Command will be specified in docker-compose.test.yml

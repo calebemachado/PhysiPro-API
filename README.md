@@ -64,6 +64,11 @@ A robust API for physical therapy professionals to manage patients, treatment pl
    npm run dev
    ```
 
+   Or use the safer development mode that automatically checks and starts the database if needed:
+   ```bash
+   npm run dev:safe
+   ```
+
 ### Docker Setup
 
 1. Start the database:
@@ -111,6 +116,20 @@ API documentation is available at `/api/docs` when the server is running.
 
 ## Development
 
+### Development with Database Auto-start
+
+The `dev:safe` script provides a convenient way to ensure your development database is running:
+
+```bash
+npm run dev:safe
+```
+
+This script:
+- Checks if the database is running
+- Starts it using Docker if it's not available
+- Preserves database data between restarts (using Docker volumes)
+- Automatically starts the development server once the database is ready
+
 ### Build
 
 ```bash
@@ -145,4 +164,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 Your Name - calebe@clsax.tech
 
-Project Link: [https://github.com/your-username/physipro-api](https://github.com/your-username/physipro-api) 
+Project Link: [https://github.com/your-username/physipro-api](https://github.com/your-username/physipro-api)

@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:14-alpine
-    container_name: physipro-postgres
+    container_name: physipro-postgres-dev
     ports:
-      - 5433:5432
+      - '5433:5432'
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}

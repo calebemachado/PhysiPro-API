@@ -1,1 +1,0 @@
-import compression from 'compression';

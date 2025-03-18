@@ -26,17 +26,51 @@ E2E tests verify the entire application flow. These tests are located in `src/te
 
 ## Running Tests
 
-### Run All Tests
+You can run tests using the following commands:
 
 ```bash
+# Run all tests
 npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run only unit tests
+npm run test:unit
+
+# Run only integration tests (requires PostgreSQL on port 5434)
+npm run test:integration
+
+# Run integration tests with Docker (recommended)
+npm run test:integration:docker
 ```
 
-### Run Tests with Coverage
+### Docker Integration Testing
+
+We've set up a Docker-based integration testing environment that:
+
+1. Spins up a dedicated PostgreSQL container for testing
+2. Runs the integration tests against this isolated database
+3. Automatically tears down everything when the tests complete
+
+This approach ensures:
+- Tests run in a clean, isolated environment
+- No conflicts with your development database
+- Consistent test results across different machines
+- No need to manually manage test databases
+
+To run integration tests with Docker:
 
 ```bash
-npm run test:coverage
+# Make sure Docker and Docker Compose are installed
+npm run test:integration:docker
 ```
+
+The script automatically:
+- Builds the necessary Docker images
+- Starts a PostgreSQL container
+- Runs the tests
+- Cleans up when done (even if tests fail)
 
 ### Run Unit Tests Only
 
