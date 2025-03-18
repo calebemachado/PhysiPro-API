@@ -29,7 +29,7 @@ sleep 5
 # Check if PostgreSQL is running
 if docker-compose ps postgres | grep -q "Up"; then
   echo "PostgreSQL is running!"
-  echo "Database URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@localhost:5432/${DB_NAME:-physipro}"
+  echo "Database URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@localhost:5433/${DB_NAME:-physipro}"
 else
   echo "Error: PostgreSQL failed to start."
   docker-compose logs postgres
@@ -52,4 +52,4 @@ echo "  Host: localhost"
 echo "  Port: 5433"
 echo "  Database: physipro"
 echo "  Username: postgres"
-echo "  Password: postgres" 
+echo "  Password: postgres"

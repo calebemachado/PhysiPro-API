@@ -119,7 +119,7 @@ PORT=3000
 
 # Database Configuration
 DB_HOST=db.example.com
-DB_PORT=5432
+DB_PORT=5433
 DB_NAME=physipro_prod
 DB_USER=dbuser
 DB_PASSWORD=dbpassword

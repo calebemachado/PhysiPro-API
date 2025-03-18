@@ -46,7 +46,7 @@ A robust API for physical therapy professionals to manage patients, treatment pl
    
    # Database Configuration
    DB_HOST=localhost
-   DB_PORT=5432
+   DB_PORT=5433
    DB_NAME=physipro
    DB_USER=postgres
    DB_PASSWORD=postgres

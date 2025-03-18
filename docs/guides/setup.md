@@ -41,7 +41,7 @@ NODE_ENV=development
 
 # Database Configuration
 DB_HOST=localhost
-DB_PORT=5432
+DB_PORT=5433
 DB_NAME=physipro_dev
 DB_USER=postgres
 DB_PASSWORD=your_password
